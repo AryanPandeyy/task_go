@@ -25,17 +25,7 @@ func main() {
 		log.Fatal("Please provide argument")
 	}
 	if os.Args[1] == "add" {
-		f, err := os.OpenFile("/home/ap/code/fun/tp/go/sample", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
-		if err != nil {
-			log.Fatal(err)
-		}
-		var tsk string
-		fmt.Print("Enter the task: ")
-		fmt.Scan(&tsk)
-		t := Task{1, tsk, "NOTDONE", time.Now().Format(time.DateTime), time.Now().Format(time.DateTime)}
-		fmt.Println(t)
-		// 		t1 := ListTask{Tasks: []Task{t}}
-		//
+		f, err := os.OpenFile("/home/ap/code/fun/tp/go/sample", os.O_CREATE|os.O_RDWR, 0644)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -44,34 +34,46 @@ func main() {
 		if e != nil {
 			log.Fatal(e)
 		}
-		fmt.Println(b[0])
 
 		tmp := ListTask{Tasks: []Task{}}
 		json.Unmarshal(b, &tmp)
-		fmt.Print("EH", tmp.Tasks[1])
-		if (len(tmp.Tasks) > 1) {
-			tmp.Tasks = append(tmp.Tasks, t)
+		fmt.Println("EXIST CONTENT: ", tmp.Tasks)
 
-			b, e := json.MarshalIndent(tmp.Tasks, "", "  ")
+		var tsk string
+		fmt.Print("Enter the task: ")
+		fmt.Scan(&tsk)
+		id := len(tmp.Tasks) + 1;
+		t := Task{id, tsk, "NOTDONE", time.Now().Format(time.DateTime), time.Now().Format(time.DateTime)}
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if (len(tmp.Tasks) >= 1) {
+			tmp.Tasks = append(tmp.Tasks, t)
+			b, e := json.MarshalIndent(tmp, "", "  ")
+			// b, e := json.Marshal(tmp)
 			if e != nil {
 				log.Fatal(e)
 			}
-			fmt.Println(string(b))
+			fmt.Println("AFTER ADDING CONTENT: ", string(b))
+
+			if _,err := f.Write(b); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			t1 := ListTask{Tasks: []Task{t}}
+			b, e := json.MarshalIndent(t1, "", "  ")
+			// b, e := json.Marshal(t1)
+			if e != nil {
+				log.Fatal(e)
+			}
+			fmt.Println("ADDING CONTENT FIRST: ", string(b))
 
 			if _,err := f.Write(b); err != nil {
 				log.Fatal(err)
 			}
 		}
 
-		// b, e := json.MarshalIndent(t1, "", "  ")
-		// if e != nil {
-		// 	log.Fatal(e)
-		// }
-		// fmt.Println(string(b))
-
-		// if _,err := f.Write(b); err != nil {
-		// 	log.Fatal(err)
-		// }
 
 		f.Close()
 	} else if os.Args[1] == "list" {
