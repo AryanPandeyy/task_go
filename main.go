@@ -74,8 +74,18 @@ func main() {
 			}
 		}
 
-
 		f.Close()
 	} else if os.Args[1] == "list" {
+		b, e := os.ReadFile("/home/ap/code/fun/tp/go/sample")
+		if e != nil {
+			log.Fatal(e)
+		}
+
+		tmp := ListTask{Tasks: []Task{}}
+		json.Unmarshal(b, &tmp)
+
+		for _, v := range tmp.Tasks {
+			fmt.Println(v.Description)
+		}
 	}
 }
